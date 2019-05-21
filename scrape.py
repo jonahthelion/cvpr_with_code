@@ -16,15 +16,18 @@ def get_info(df, present_type):
         driver.get(url)
         value = driver.find_element_by_class_name('infinite-container')
         items = value.find_elements_by_class_name('infinite-item')
-        for item in items[:1]:
-            badge = item.find_element_by_class_name('badge-dark')
-            if badge.text == 'Code':
-                badge.click()
-                impls = driver.find_element_by_id('id_paper_implementations_collapsed')
-                github_link = impls.find_element_by_class_name('code-table-link').get_attribute('href')
-                stars = int(impls.text.split('\n')[1].replace(',', ''))
-                info.append([name, present_type, github_link, stars])
-                success = True
+        for item in items:
+            title = item.find_element_by_tag_name('h1').text
+            if title == name:
+                badge = item.find_element_by_class_name('badge-dark')
+                if badge.text == 'Code':
+                    badge.click()
+                    impls = driver.find_element_by_id('id_paper_implementations_collapsed')
+                    github_link = impls.find_element_by_class_name('code-table-link').get_attribute('href')
+                    stars = int(impls.text.split('\n')[1].replace(',', ''))
+                    info.append([name, present_type, github_link, stars])
+                    success = True
+                break
         if not success:
             info.append([name, present_type, '', 0])
     return info
