@@ -29,6 +29,14 @@ def get_info(df, present_type):
             info.append([name, present_type, '', 0])
     return info
 
+def get_score(row):
+    score = row.stars
+    if len(row['github link']) > 0:
+        score += 0.5
+    if row['presentation type'] == 'Oral':
+        score += 0.1
+    return score
+
 driver = webdriver.Chrome('/Users/jonahphilion/Downloads/chromedriver')  # Optional argument, if not specified will search path.
 info = []
 
@@ -41,8 +49,11 @@ info.extend(get_info(df_oral, 'Oral'))
 driver.quit()
 
 out_df = pd.DataFrame(info)
-out_df.columns = ['name', 'presentation type', 'github link', 'stars']
-out_df = out_df.sort_values(['stars', 'presentation type'], ascending=False)
+colnames = ['name', 'presentation type', 'github link', 'stars']
+out_df.columns = colnames
+out_df['score'] = out_df.apply(get_score, axis=1)
+out_df = out_df.sort_values(['score', 'github link'], ascending=False)
+out_df = out_df[colnames]
 out_df.index = range(1, len(out_df) + 1)
 outname = 'cvpr_2019_github_links.csv'
 print('saving', outname)
