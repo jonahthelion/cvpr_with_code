@@ -18,7 +18,7 @@ def get_info(df, present_type):
         items = value.find_elements_by_class_name('infinite-item')
         for item in items:
             title = item.find_element_by_tag_name('h1').text
-            if title == name:
+            if title.lower() == name.lower():
                 badge = item.find_element_by_class_name('badge-dark')
                 if badge.text == 'Code':
                     badge.click()
