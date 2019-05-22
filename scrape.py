@@ -18,7 +18,7 @@ def get_info(df, present_type):
         items = value.find_elements_by_class_name('infinite-item')
         for item in items:
             title = item.find_element_by_tag_name('h1').text
-            if title.lower() == name.lower():
+            if check_name_match(title, name):
                 badge = item.find_element_by_class_name('badge-dark')
                 if badge.text == 'Code':
                     badge.click()
@@ -28,9 +28,27 @@ def get_info(df, present_type):
                     info.append([name, present_type, github_link, stars])
                     success = True
                 break
+            else:
+                print(name, title)
         if not success:
             info.append([name, present_type, '', 0])
     return info
+
+def prepro(s):
+    return s.lower().replace(' ', '').replace('-', '').replace('!', '').replace('s', '')
+
+def check_name_match(title, name):
+    if prepro(title).replace(':', '') == prepro(name).replace(':', ''):
+        return True
+    for s in title.split(':'):
+        for na in name.split(':'):
+            if prepro(na) == prepro(s):
+                return True
+    twords = set(title.split(' '))
+    nwords = set(name.split(' '))
+    if nwords.issubset(twords):
+        return True
+    return False
 
 def get_score(row):
     score = row.stars
