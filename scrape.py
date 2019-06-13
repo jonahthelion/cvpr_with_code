@@ -18,12 +18,19 @@ def get_score(row):
 def get_paper_info():
     print('getting paper info...')
     info = {}
-    base_url = 'http://openaccess.thecvf.com/content_CVPR_2019/html/'
+    base_url = 'http://openaccess.thecvf.com/CVPR2019.py'
     soup = BeautifulSoup(requests.get(base_url).content, "lxml")
     for a in tqdm(soup.find_all('a')):
-        if a.get('href')[-5:] != '.html':
+        link = a.get('href')
+        if link is None or link[-5:] != '.html':
             continue
-        paper = BeautifulSoup(requests.get(base_url + a.get('href')).content, "lxml")
+        link = "http://openaccess.thecvf.com/{}".format(a.get('href'))
+        # bug in cvf
+        if link == "http://openaccess.thecvf.com/content_CVPR_2019/html/Gao_2.5D_Visual_Sound_CVPR_2019_paper.html":
+            link = "http://openaccess.thecvf.com/content_CVPR_2019/html/Gao_2.html"
+        elif link == "http://openaccess.thecvf.com/content_CVPR_2019/html/Zhang_AET_vs._AED_Unsupervised_Representation_Learning_by_Auto-Encoding_Transformations_Rather_CVPR_2019_paper.html":
+            link = "http://openaccess.thecvf.com/content_CVPR_2019/html/Zhang_AET_vs.html"
+        paper = BeautifulSoup(requests.get(link).content, "lxml")
         title = unidecode(paper.find('div', {'id': 'papertitle'}).text.lstrip())
         authors = unidecode(paper.find('i').text).split(',  ')
         abstract = unidecode(paper.find('div', {'id': 'abstract'}).text.strip())
